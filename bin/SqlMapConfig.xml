@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+
+	<properties resource="jdbc.properties"></properties>
+	
+	<!-- 别名 -->
+	<typeAliases>
+<!-- 		<typeAlias type="cn.itheima.mybatis.pojo.User" alias="User"/>
+ -->
+ 		<!-- 包及其子包下所有的类，首字母大小写都可以 -->
+ 		<package name="cn.itheima.mybatis.pojo"/>
+ 	</typeAliases>
+
+	<!-- 和spring整合后 environments配置将废除 -->
+	<environments default="development">
+		<environment id="development">
+			<!-- 使用jdbc事务管理 -->
+			<transactionManager type="JDBC" />
+			<!-- 数据库连接池 -->
+			<dataSource type="POOLED">
+				<property name="driver" value="${jdbc.driver}" />
+				<property name="url"
+					value="jdbc:mysql://localhost:3306/mybatis?characterEncoding=utf-8" />
+				<property name="username" value="root" />
+				<property name="password" value="root" />
+			</dataSource>
+		</environment>
+	</environments>
+	
+	
+	<mappers>
+		<mapper resource="sqlmap/User.xml" />
+		<mapper resource="sqlmap/Order.xml" />
+		<!--
+		此种方法要求mapper接口名称和mapper映射文件名称相同，且放在同一个目录中
+ 		<mapper class="cn.itheima.mybatis.mapper.UserMapper" />
+		 -->
+		<!--
+		此种方法要求指定User.xml绝对路径
+ 		<mapper url="" />
+		 -->
+		<!--
+		此种方法要求mapper接口名称和mapper映射文件名称相同，且放在同一个目录中
+ 		<package name="cn.itheima.mybatis.mapper" />
+		 -->
+ 	</mappers>
+</configuration>

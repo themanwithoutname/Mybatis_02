@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace：命名空间，用于隔离sql，还有一个很重要的作用，后面会讲 -->
+<mapper namespace="cn.itheima.mybatis.mapper.OrderMapper">
+	<resultMap type="Order" id="order">
+	<!-- 可以只写名称不同的字段映射，相同的可以不写
+		<id column="id" property="id" />
+		<result column="number" property="number" />
+		<result column="createtime" property="createtime" />
+		<result column="note" property="note" />
+	 -->	
+		<result column="user_id" property="userId" />
+	</resultMap>
+	
+	
+	<select id="selectOrdersList" resultMap="order">
+		select id, user_id, number, createtime, note from orders
+	</select>
+	
+	
+	<resultMap type="Order" id="orderUser">
+		<id column="id" property="id" />
+		<result column="user_id" property="userId" />
+		<result column="number" property="number" />
+		<result column="createtime" property="createtime" />
+		<result column="note" property="note" />
+		<!-- 一对一  -->
+		<association property="user" javaType="User">
+			<id column="user_id" property="id"/>
+			<result column="username" property="username"/>
+			<result column="sex" property="sex"/>
+			<result column="birthday" property="birthday"/>
+			<result column="address" property="address"/>
+		</association>
+	</resultMap>
+	<!-- 一对一查询 -->
+	<select id="selectOrders" resultMap="orderUser">
+		select 
+			o.id, 
+			o.user_id, 
+			o.number, 
+			o.createtime, 
+			o.note, 
+			u.username,
+			u.sex,
+			u.birthday,
+			u.address
+		from orders o left join user u 
+		on o.user_id=u.id
+	</select>
+	
+	
+</mapper>

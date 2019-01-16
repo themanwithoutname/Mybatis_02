@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace：命名空间，用于隔离sql，还有一个很重要的作用，后面会讲 -->
+<mapper namespace="cn.itheima.mybatis.mapper.UserMapper">
+	
+	
+	<sql id="selector">
+		select * from user
+	</sql>
+	
+	
+	
+	
+	
+	
+	
+	<!-- id:statement的id 或者叫做sql的id-->
+	<!-- parameterType:声明输入参数的类型 -->
+	<!-- resultType:声明输出结果的类型，应该填写pojo的全路径 -->
+	<!-- #{}：输入参数的占位符，相当于jdbc的？ -->
+	<select id="findUserById" parameterType="int"
+		resultType="User">
+		SELECT * FROM user WHERE id  = #{v}
+	</select>	
+	
+	<!-- 根据用户名模糊查询用户列表
+	#{}	selct * from user where id=?	占位符	?=='五'
+	${value}	selct * from user where username like '%五%'	字符串拼接(大括号中必须用value)
+	
+			select * from user where username like '%${value}%'
+	也可以写：	select * from user where username like "%"#{haha}"%"
+	 -->
+	<select id="findUserByUsername" parameterType="String" resultType="cn.itheima.mybatis.pojo.User">
+		select * from user where username like '%${value}%'
+	</select>
+	
+	<insert id="insertUser" parameterType="cn.itheima.mybatis.pojo.User">
+		<selectKey keyProperty="id" resultType="Integer" order="AFTER">
+			select LAST_INSERT_ID()
+		</selectKey>
+		
+		insert into user(username,sex,birthday,address)
+		values(#{username},#{sex},#{birthday},#{address})
+	</insert>
+	
+	<update id="updateUserById" parameterType="cn.itheima.mybatis.pojo.User">
+		update user
+		set username=#{username},sex=#{sex},address=#{address},birthday=#{birthday}
+		where id=#{id}
+	</update>
+	
+	<delete id="deleteUserById" parameterType="Integer">
+		delete from user
+		where id=#{id}
+	</delete>
+	
+	<!-- 根据用户名模糊查询  -->
+	<select id="findUserByQueryVo" parameterType="QueryVo" resultType="cn.itheima.mybatis.pojo.User">
+		select * from user where username like "%"#{user.username}"%"
+	</select>
+	
+	<!-- 根据用户名模糊查询  -->
+	<select id="countUser" resultType="Integer">
+		select count(*) from user
+	</select>
+
+	
+	<!-- 根据用户名和性别查询,Where标签可以去掉第一个and  -->
+	<select id="selectUserBySexAndUsername" parameterType="user" resultType="User">
+		<!-- select * from user -->
+		<include refid="selector"/>
+		<where>
+			<if test="sex!=null and sex!=''">
+			and sex=#{sex}
+			</if>
+			<if test="username!=null and username!=''">
+			and username=#{username}
+			</if>
+		</where>
+	</select>
+	
+	
+	<!-- 根据多个id  -->
+	<select id="selectUserByIds" parameterType="QueryVo" resultType="User">
+		<!-- select * from user -->
+		<include refid="selector"/>
+		<where>
+			<foreach collection="idsList" item="id" separator="," open="id in (" close=")" >
+				#{id}
+			</foreach>
+		</where>
+	</select>
+	<select id="selectUserByIds1" resultType="User">
+		<!-- select * from user -->
+		<include refid="selector"/>
+		<where>
+			<foreach collection="list" item="id" separator="," open="id in (" close=")" >
+				#{id}
+			</foreach>
+		</where>
+	</select>
+	<select id="selectUserByIds2" resultType="User">
+		<!-- select * from user -->
+		<include refid="selector"/>
+		<where>
+			<foreach collection="array" item="id" separator="," open="id in (" close=")" >
+				#{id}
+			</foreach>
+		</where>
+	</select>
+	
+	
+	<!-- 一对多 -->
+	<resultMap id="userOrderMap" type="User">
+		<id column="uid" property="id" />
+		<result column="username" property="username" />
+		<result column="sex" property="sex"/>
+		<result column="birthday" property="birthday"/>
+		<result column="address" property="address"/>
+		<collection property="orders" ofType="Order">
+			<id column="id" property="id"/>
+			<result column="user_id" property="userId" />
+			<result column="number" property="number" />
+			<result column="createtime" property="createtime" />
+			<result column="note" property="note" />
+		</collection>
+	</resultMap>
+	<select id="selectUserOneToMany" resultMap="userOrderMap">
+		select 
+			u.id uid, 
+			u.username,
+			u.sex,
+			u.birthday,
+			u.address,
+			o.id, 
+			o.user_id,
+			o.number, 
+			o.createtime, 
+			o.note
+		from user u left join orders o 
+		on o.user_id=u.id
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</mapper>
